@@ -14,13 +14,48 @@
     const contractAddress = "0x4f97ed71fe42775c3854B0f5a686073284d8F9eD";  // ← 당신이 배포한 Sepolia 주소로 바꾸세요
 
     // 📌 updatePosition(string) ABI만 포함
-    const abi = [
-      {
-        "inputs": [{ "internalType": "string", "name": "pos", "type": "string" }],
-        "name": "updatePosition",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
+    const abi = 
+      
+       [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "pos",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "PositionUpdated",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "pos",
+				"type": "string"
+			}
+		],
+		"name": "updatePosition",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	
+
       }
     ];
 
