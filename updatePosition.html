@@ -7,16 +7,14 @@
 </head>
 <body>
   <h2>🛰 위치를 블록체인에 전송 중...</h2>
-  <div id="status" style="color: red;"></div>
+  <div id="status" style="color:red;"></div>
 
   <script>
-    // 📌 Remix에서 복사한 실제 컨트랙트 주소를 여기에 입력
-    const contractAddress = "0x4f97ed71fe42775c3854B0f5a686073284d8F9eD";  // ← 당신이 배포한 Sepolia 주소로 바꾸세요
+    // ✅ 1. Remix에서 배포한 컨트랙트 주소
+    const contractAddress = "0x4f97ed71fe42775c3854B0f5a686073284d8F9eD"; // ← 수정 필요
 
-    // 📌 updatePosition(string) ABI만 포함
-    const abi = 
-      
-       [
+    // ✅ 2. Remix에서 복사한 ABI 붙여넣기
+    const abi = [
 	{
 		"anonymous": false,
 		"inputs": [
@@ -54,36 +52,37 @@
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
-	
+	}
+];
 
-      }
-    ];
-
-    // 🧠 URL에서 pos 파라미터 읽기
+    // ✅ 3. URL에서 전달된 좌표 문자열 추출 (?pos=...)
     const urlParams = new URLSearchParams(window.location.search);
     const pos = urlParams.get("pos");
 
     if (!pos) {
-      document.getElementById("status").innerText = "❌ 좌표 정보가 누락되었습니다.";
+      document.getElementById("status").innerText = "❌ 좌표값이 없습니다.";
       throw new Error("Missing ?pos= parameter in URL");
     }
 
-    // 🌐 웹3 연동 및 전송
     window.onload = async () => {
       if (typeof window.ethereum === "undefined") {
-        alert("MetaMask를 설치해주세요!");
+        alert("🦊 MetaMask를 설치해주세요!");
         return;
       }
 
       const web3 = new Web3(window.ethereum);
-      await window.ethereum.request({ method: "eth_requestAccounts" });
 
-      const accounts = await web3.eth.getAccounts();
-      const contract = new web3.eth.Contract(abi, contractAddress);
-	   console.log("📦 전달할 pos:", pos);
-  console.log("🧾 내 계정:", accounts[0]);
-  console.log("📡 contract.methods:", contract.methods);
       try {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await web3.eth.getAccounts();
+
+        // ✅ 전역으로 contract 선언하면 콘솔에서도 접근 가능
+        window.contract = new web3.eth.Contract(abi, contractAddress);
+
+        console.log("📦 좌표:", pos);
+        console.log("👛 계정:", accounts[0]);
+        console.log("📡 contract.methods:", contract.methods);
+
         await contract.methods.updatePosition(pos).send({
           from: accounts[0]
         });
@@ -91,8 +90,7 @@
         document.getElementById("status").style.color = "green";
         document.getElementById("status").innerText = "✅ 블록체인 전송 성공!";
       } catch (error) {
-        console.error("전송 오류:", error);
-        document.getElementById("status").style.color = "red";
+        console.error("❌ 오류:", error);
         document.getElementById("status").innerText = "❌ 전송 중 오류 발생!";
       }
     };
