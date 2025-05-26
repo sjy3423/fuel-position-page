@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send Position to Blockchain</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body>
+  <h2>🛰 위치를 블록체인에 전송 중...</h2>
+  <script>
+    window.onload = async () => {
+      // 1. URL에서 좌표 문자열 받기
+      const urlParams = new URLSearchParams(window.location.search);
+      const pos = urlParams.get("pos");
+
+      // 2. MetaMask 있는지 확인
+      if (typeof window.ethereum === "undefined") {
+        alert("MetaMask를 설치해주세요!");
+        return;
+      }
+
+      // 3. 지갑 연결 요청
+      const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+      const web3 = new Web3(window.ethereum);
+
+      // 4. 스마트 컨트랙트 주소 + ABI
+      const contractAddress = "0xYourContractAddressHere"; // <-- STEP 5에서 바꿔야 해요!
+      const abi = [
+        {
+          "inputs": [{ "internalType": "string", "name": "pos", "type": "string" }],
+          "name": "updatePosition",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ];
+
+      const contract = new web3.eth.Contract(abi, contractAddress);
+
+      // 5. 트랜잭션 보내기
+      try {
+        const tx = await contract.methods.updatePosition(pos).send({ from: accounts[0] });
+        console.log("✅ 전송 성공:", tx);
+        document.body.innerHTML += `<p style="color:green;">✔ 성공적으로 전송됨!</p>`;
+      } catch (err) {
+        console.error("❌ 전송 실패:", err);
+        document.body.innerHTML += `<p style="color:red;">❌ 전송 중 오류 발생!</p>`;
+      }
+    };
+  </script>
+</body>
+</html>
