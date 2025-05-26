@@ -80,7 +80,9 @@
 
       const accounts = await web3.eth.getAccounts();
       const contract = new web3.eth.Contract(abi, contractAddress);
-
+	   console.log("📦 전달할 pos:", pos);
+  console.log("🧾 내 계정:", accounts[0]);
+  console.log("📡 contract.methods:", contract.methods);
       try {
         await contract.methods.updatePosition(pos).send({
           from: accounts[0]
