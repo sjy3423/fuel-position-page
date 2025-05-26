@@ -1,49 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
+  <meta charset="UTF-8">
   <title>Send Position to Blockchain</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 <body>
   <h2>🛰 위치를 블록체인에 전송 중...</h2>
-  <script>
-    window.onload = async () => {
-      // 1. URL에서 좌표 문자열 받기
-      const urlParams = new URLSearchParams(window.location.search);
-      const pos = urlParams.get("pos");
+  <div id="status" style="color: red;"></div>
 
-      // 2. MetaMask 있는지 확인
+  <script>
+    // 📌 Remix에서 복사한 실제 컨트랙트 주소를 여기에 입력
+    const contractAddress = "0x4f97ed71fe42775c3854B0f5a686073284d8F9eD";  // ← 당신이 배포한 Sepolia 주소로 바꾸세요
+
+    // 📌 updatePosition(string) ABI만 포함
+    const abi = [
+      {
+        "inputs": [{ "internalType": "string", "name": "pos", "type": "string" }],
+        "name": "updatePosition",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ];
+
+    // 🧠 URL에서 pos 파라미터 읽기
+    const urlParams = new URLSearchParams(window.location.search);
+    const pos = urlParams.get("pos");
+
+    if (!pos) {
+      document.getElementById("status").innerText = "❌ 좌표 정보가 누락되었습니다.";
+      throw new Error("Missing ?pos= parameter in URL");
+    }
+
+    // 🌐 웹3 연동 및 전송
+    window.onload = async () => {
       if (typeof window.ethereum === "undefined") {
         alert("MetaMask를 설치해주세요!");
         return;
       }
 
-      // 3. 지갑 연결 요청
-      const accounts = await ethereum.request({ method: "eth_requestAccounts" });
       const web3 = new Web3(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
 
-      // 4. 스마트 컨트랙트 주소 + ABI
-      const contractAddress = "0x4f97ed71fe42775c3854B0f5a686073284d8F9eD"; // <-- STEP 5에서 바꿔야 해요!
-      const abi = [
-        {
-          "inputs": [{ "internalType": "string", "name": "pos", "type": "string" }],
-          "name": "updatePosition",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        }
-      ];
-
+      const accounts = await web3.eth.getAccounts();
       const contract = new web3.eth.Contract(abi, contractAddress);
 
-      // 5. 트랜잭션 보내기
       try {
-        const tx = await contract.methods.updatePosition(pos).send({ from: accounts[0] });
-        console.log("✅ 전송 성공:", tx);
-        document.body.innerHTML += `<p style="color:green;">✔ 성공적으로 전송됨!</p>`;
-      } catch (err) {
-        console.error("❌ 전송 실패:", err);
-        document.body.innerHTML += `<p style="color:red;">❌ 전송 중 오류 발생!</p>`;
+        await contract.methods.updatePosition(pos).send({
+          from: accounts[0]
+        });
+
+        document.getElementById("status").style.color = "green";
+        document.getElementById("status").innerText = "✅ 블록체인 전송 성공!";
+      } catch (error) {
+        console.error("전송 오류:", error);
+        document.getElementById("status").style.color = "red";
+        document.getElementById("status").innerText = "❌ 전송 중 오류 발생!";
       }
     };
   </script>
