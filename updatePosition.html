@@ -11,10 +11,11 @@
 
   <script>
     // ✅ 1. Remix에서 배포한 컨트랙트 주소
-    const contractAddress = "0x4f97ed71fe42775c3854B0f5a686073284d8F9eD"; // ← 수정 필요
+    const contractAddress = "0x4AE69DfF9A7948566E7263Ed35072880EC2FDAD9"; // ← 수정 필요
 
     // ✅ 2. Remix에서 복사한 ABI 붙여넣기
     const abi = [
+	
 	{
 		"anonymous": false,
 		"inputs": [
@@ -53,6 +54,7 @@
 		"stateMutability": "nonpayable",
 		"type": "function"
 	}
+
 ];
 
     // ✅ 3. URL에서 전달된 좌표 문자열 추출 (?pos=...)
